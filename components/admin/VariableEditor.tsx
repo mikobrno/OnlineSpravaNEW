@@ -8,7 +8,7 @@ import { Button } from '../common/Button';
 import { Card, CardContent } from '../common/Card';
 import { Save } from 'lucide-react';
 
-export const VariableEditor = ({ id, onBack }: { id: number | null; onBack: () => void; }) => {
+export const VariableEditor = ({ id, onBack }: { id: string | null; onBack: () => void; }) => {
     const { variables, addVariable, updateVariable } = useAppContext();
     const { addToast } = useToast();
     

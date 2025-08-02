@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Building2, FileText, Variable, Terminal, BarChart2 } from 'lucide-react';
 import { AdminDashboard } from './AdminDashboard';
 import { BuildingManager } from '../building/BuildingManager';
@@ -54,7 +54,7 @@ export const AdvancedAdminView = () => {
         switch(view.type) {
             case 'buildings': return <BuildingEditor id={view.id as string | null} onBack={handleBack} />;
             case 'templates': return <TemplateEditor id={view.id as string | null} onBack={handleBack} />;
-            case 'variables': return <VariableEditor id={view.id as number | null} onBack={handleBack} />;
+            case 'variables': return <VariableEditor id={view.id as string | null} onBack={handleBack} />;
             default: return renderListView(); // Fallback
         }
     };
