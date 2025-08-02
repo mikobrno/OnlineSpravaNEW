@@ -1,0 +1,16 @@
+-- RYCHLÉ ŘEŠENÍ - VYPNOUT RLS ÚPLNĚ (jen pro testování)
+
+-- Vypnout Row Level Security na všech tabulkách
+ALTER TABLE buildings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE variables DISABLE ROW LEVEL SECURITY;
+ALTER TABLE email_templates DISABLE ROW LEVEL SECURITY;
+ALTER TABLE members DISABLE ROW LEVEL SECURITY;
+ALTER TABLE votes DISABLE ROW LEVEL SECURITY;
+ALTER TABLE vote_options DISABLE ROW LEVEL SECURITY;
+ALTER TABLE cast_votes DISABLE ROW LEVEL SECURITY;
+ALTER TABLE emails DISABLE ROW LEVEL SECURITY;
+
+-- Test přístupu
+SELECT 'RLS VYPNUTO ✅ - PLNÝ PŘÍSTUP' as status;
+SELECT COUNT(*) as pocet_budov FROM buildings;
+SELECT COUNT(*) as pocet_promennych FROM variables;
