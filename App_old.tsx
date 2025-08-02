@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react';
-import { supabase } from './lib/supabaseClient';
-import { Session } from '@supabase/supabase-js';
 import { useAppContext } from './contexts/AppContext';
 import { useTheme } from './contexts/ThemeContext';
-import { Login } from './components/auth/Login';
 import { SimpleGeneratorView } from './components/EmailGenerator';
 import { AdvancedAdminView } from './components/admin/AdvancedAdminView';
 import VotingDashboard from './components/VotingDashboard';
 import { MembersView } from './components/members/MembersView';
-import { SupabaseStatus } from './components/common/SupabaseStatus';
+import { SupabaseStatus, SupabaseSetupBanner } from './components/common/SupabaseStatus';
 import { supabaseManager } from './lib/supabaseManager';
-import { Mail, Vote as VoteIcon, SlidersHorizontal, Building, ChevronsUpDown, Check, UserPlus, Sun, Moon, LogOut } from 'lucide-react';
+import { Mail, Vote as VoteIcon, SlidersHorizontal, Building, ChevronsUpDown, Check, UserPlus, Sun, Moon } from 'lucide-react';
 
 const ThemeSwitcher = () => {
     const { theme, toggleTheme } = useTheme();
@@ -25,46 +22,6 @@ const ThemeSwitcher = () => {
     );
 };
 
-const UserProfile = ({ session }: { session: Session }) => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-    };
-
-    const userEmail = session.user.email || '';
-    const userName = userEmail.split('@')[0];
-
-    return (
-        <div className="relative">
-            <button 
-                onClick={() => setIsMenuOpen(!isMenuOpen)} 
-                className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-            >
-                <div className="text-right">
-                    <div className="text-sm font-medium">{userName}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">{userEmail}</div>
-                </div>
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                    {userName.charAt(0).toUpperCase()}
-                </div>
-            </button>
-
-            {isMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-1 z-50">
-                    <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
-                    >
-                        <LogOut className="h-4 w-4" />
-                        Odhlásit se
-                    </button>
-                </div>
-            )}
-        </div>
-    );
-};
-
 const BuildingSelector = () => {
     const { buildings, selectedBuildingId, setSelectedBuildingId } = useAppContext();
     const [isOpen, setIsOpen] = useState(false);
@@ -75,17 +32,29 @@ const BuildingSelector = () => {
         <div className="relative">
             <button 
                 onClick={() => setIsOpen(!isOpen)} 
-                className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="flex items-center gap-2 text-gray-800 dark:text-white bg-blue-100 dark:bg-blue-900/30 px-3 py-2 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800/40 transition-colors border border-blue-200 dark:border-blue-700"
             >
-                <Building className="h-4 w-4" />
-                <span className="text-sm font-medium">
-                    {selectedBuilding?.name || 'Vyberte budovu'}
+                <Building className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <span className="font-medium text-sm">
+                    {selectedBuilding ? selectedBuilding.name : 'Vyberte dům'}
                 </span>
-                <ChevronsUpDown className="h-4 w-4" />
+                <ChevronsUpDown className="h-4 w-4 text-blue-500 dark:text-blue-400" />
             </button>
-
             {isOpen && (
                 <div className="absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-1 z-50">
+                    <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
+                        Vyberte dům
+                    </div>
+                    <button 
+                        onClick={() => {
+                            setSelectedBuildingId(null);
+                            setIsOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between"
+                    >
+                        <span>Žádný dům</span>
+                        {!selectedBuildingId && <Check className="h-4 w-4 text-green-500" />}
+                    </button>
                     {buildings.map((building) => (
                         <button
                             key={building.id}
@@ -105,21 +74,82 @@ const BuildingSelector = () => {
     );
 };
 
+const UserSelector = () => {
+    const { users, currentUser, setCurrentUserById } = useAppContext();
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+    const handleUserChange = (userId: string) => {
+        setCurrentUserById(userId);
+        setIsUserMenuOpen(false);
+    };
+
+    const getRoleName = (role: string) => {
+        switch(role) {
+            case 'admin': return 'Admin';
+            case 'member': return 'Člen';
+            case 'observer': return 'Pozorovatel';
+            default: return 'Uživatel';
+        }
+    }
+
+    return (
+        <div className="relative">
+            <button 
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} 
+                className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+                <div className="text-right">
+                    <div className="text-sm font-medium">{currentUser?.name}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{getRoleName(currentUser?.role || '')}</div>
+                </div>
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    {currentUser?.name?.charAt(0) || 'U'}
+                </div>
+            </button>
+
+            {isUserMenuOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-1 z-50">
+                    <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
+                        Přepnout uživatele
+                    </div>
+                    {users.map((user) => (
+                        <button
+                            key={user.id}
+                            onClick={() => handleUserChange(user.id)}
+                            className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between"
+                        >
+                            <div>
+                                <div className="font-medium">{user.name}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">{getRoleName(user.role)}</div>
+                            </div>
+                            {currentUser?.id === user.id && <Check className="h-4 w-4 text-green-500" />}
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
 const AppNavigation = ({ appView, setAppView }: { 
     appView: string, 
     setAppView: (view: string) => void
 }) => {
+    const { currentUser } = useAppContext();
+
     const NAV_ITEMS = [
-        { id: 'hlasovani', name: 'Hlasování', icon: VoteIcon },
-        { id: 'sprava-clenu', name: 'Správa členů', icon: UserPlus },
-        { id: 'emailGenerator', name: 'Email generátor', icon: Mail },
-        { id: 'administrace', name: 'Administrace', icon: SlidersHorizontal },
+        { id: 'hlasovani', name: 'Hlasování', icon: VoteIcon, roles: ['admin', 'member', 'observer'] },
+        { id: 'sprava-clenu', name: 'Správa členů', icon: UserPlus, roles: ['admin'] },
+        { id: 'emailGenerator', name: 'Email generátor', icon: Mail, roles: ['admin', 'member'] },
+        { id: 'administrace', name: 'Administrace', icon: SlidersHorizontal, roles: ['admin'] },
     ];
+
+    const availableItems = NAV_ITEMS.filter(item => item.roles.includes(currentUser!.role));
 
     return (
         <div className="bg-white/95 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700">
             <nav className="px-4 sm:px-6 lg:px-8 -mb-px flex items-center space-x-6 overflow-x-auto" aria-label="Tabs">
-                {NAV_ITEMS.map(item => (
+                {availableItems.map(item => (
                     <button
                         key={item.id}
                         onClick={() => setAppView(item.id)}
@@ -139,41 +169,21 @@ const AppNavigation = ({ appView, setAppView }: {
 };
 
 function App() {
-    const { isLoading } = useAppContext();
-    const [session, setSession] = useState<Session | null>(null);
-    const [authLoading, setAuthLoading] = useState(true);
+    const { currentUser, isLoading } = useAppContext();
     const [appView, setAppView] = useState<'hlasovani' | 'emailGenerator' | 'administrace' | 'sprava-clenu'>('hlasovani');
     const [supabaseConnected, setSupabaseConnected] = useState<boolean | null>(null);
     const [supabaseErrors, setSupabaseErrors] = useState<string[]>([]);
-
-    // Kontrola autentizace
-    useEffect(() => {
-        // Získat současnou session
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setAuthLoading(false);
-        });
-
-        // Poslouchat změny autentizace
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-            setAuthLoading(false);
-        });
-
-        return () => subscription.unsubscribe();
-    }, []);
+    const [showSupabaseBanner, setShowSupabaseBanner] = useState(true);
 
     // Kontrola Supabase připojení při načtení
     useEffect(() => {
-        if (session) {
-            const checkSupabase = async () => {
-                const health = await supabaseManager.checkHealth();
-                setSupabaseConnected(health.isConnected);
-                setSupabaseErrors(health.errors);
-            };
-            checkSupabase();
-        }
-    }, [session]);
+        const checkSupabase = async () => {
+            const health = await supabaseManager.checkHealth();
+            setSupabaseConnected(health.isConnected);
+            setSupabaseErrors(health.errors);
+        };
+        checkSupabase();
+    }, []);
 
     const renderContent = () => {
         if (appView === 'hlasovani') {
@@ -192,32 +202,22 @@ function App() {
             return <MembersView />;
         }
         
-        return (
-            <div className="p-8 text-center">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Funkce se připravuje</h2>
-                <p className="text-gray-500 dark:text-gray-400 mt-2">Obsah pro '{appView}' bude brzy dostupný.</p>
-            </div>
-        );
+        return <div className="p-8 text-center"><h2 className="text-2xl font-bold text-gray-900 dark:text-white">Funkce se připravuje</h2><p className="text-gray-500 dark:text-gray-400 mt-2">Obsah pro '{appView}' bude brzy dostupný.</p></div>;
     };
-
-    if (authLoading) {
-        return (
-            <div className="flex flex-col justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
-                <VoteIcon className="h-16 w-16 text-blue-500 animate-pulse" />
-                <p className="text-gray-600 dark:text-gray-300 mt-4 text-lg">Načítání...</p>
-            </div>
-        );
-    }
-
-    if (!session) {
-        return <Login onLoginSuccess={() => {}} />;
-    }
 
     if (isLoading) {
          return (
             <div className="flex flex-col justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
                 <VoteIcon className="h-16 w-16 text-blue-500 animate-pulse" />
                 <p className="text-gray-600 dark:text-gray-300 mt-4 text-lg">Načítání dat z databáze...</p>
+            </div>
+        );
+    }
+    
+    if (!currentUser) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <p>Nelze načíst uživatele. Zkuste obnovit stránku.</p>
             </div>
         );
     }
@@ -242,7 +242,7 @@ function App() {
                                 className="mr-2"
                             />
                             <ThemeSwitcher />
-                            <UserProfile session={session} />
+                            <UserSelector />
                         </div>
                     </div>
                 </div>
@@ -253,6 +253,14 @@ function App() {
 
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Supabase Setup Banner */}
+                {supabaseConnected === false && showSupabaseBanner && supabaseErrors.length > 0 && (
+                    <SupabaseSetupBanner 
+                        errors={supabaseErrors}
+                        onDismiss={() => setShowSupabaseBanner(false)}
+                    />
+                )}
+                
                 {renderContent()}
             </main>
         </div>
