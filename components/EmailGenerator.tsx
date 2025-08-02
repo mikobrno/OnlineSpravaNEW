@@ -1,11 +1,11 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useAppContext } from '../../contexts/AppContext';
-import { useToast } from '../../contexts/ToastContext';
+import { useState, useMemo, useEffect } from 'react';
+import { useAppContext } from '../contexts/AppContext';
+import { useToast } from '../contexts/ToastContext';
 import { Eye, ArrowLeft, ArrowRight, Wand2 } from 'lucide-react';
 
-import { replaceVariables } from '../../lib/utils';
-import { Button } from '../common/Button';
-import { Card, CardContent, CardHeader } from '../common/Card';
+import { replaceVariables } from '../lib/utils';
+import { Button } from './common/Button';
+import { Card, CardContent, CardHeader } from './common/Card';
 
 
 // Simple View for generating emails

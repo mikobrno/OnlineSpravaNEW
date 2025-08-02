@@ -1,17 +1,17 @@
-import { Building, Variable, EmailTemplate, Member, Vote, UserVoteSubmission } from '../types';
+import { Building, Variable, EmailTemplate, Member, Vote, UserVoteSubmission, User } from '../types';
 
 export const MOCK_VARIABLES: Variable[] = [
-  { id: 1, key: 'nazev_spolecnosti', description: 'Název správcovské společnosti', type: 'global', value: 'OnlineSprava s.r.o.' },
-  { id: 2, key: 'kontaktni_email', description: 'Kontaktní email podpory', type: 'global', value: 'podpora@onlinesprava.cz' },
-  { id: 3, key: 'podpis_spravce', description: 'Výchozí podpis v emailu', type: 'global', value: 'S pozdravem,\nTým OnlineSprava' },
-  { id: 4, key: 'plny_nazev', description: 'Plný název SVJ/BD', type: 'building' },
-  { id: 5, key: 'zkraceny_nazev', description: 'Zkrácený název pro předměty', type: 'building' },
-  { id: 6, key: 'osloveni', description: 'Způsob oslovení členů', type: 'building' },
-  { id: 7, key: 'adresa', description: 'Adresa budovy', type: 'building' },
-  { id: 8, key: 'ico', description: 'IČO', type: 'building' },
-  { id: 9, key: 'kontaktni_osoba', description: 'Kontaktní osoba pro dům', type: 'building' },
-  { id: 10, key: 'jmeno_zastupce', description: 'Jméno zákonného zástupce člena', type: 'building'},
-  { id: 11, key: 'hlasovaci_odkaz', description: 'Unikátní odkaz na hlasování pro člena', type: 'building'},
+  { id: '1', key: 'nazev_spolecnosti', description: 'Název správcovské společnosti', type: 'global', value: 'OnlineSprava s.r.o.' },
+  { id: '2', key: 'kontaktni_email', description: 'Kontaktní email podpory', type: 'global', value: 'podpora@onlinesprava.cz' },
+  { id: '3', key: 'podpis_spravce', description: 'Výchozí podpis v emailu', type: 'global', value: 'S pozdravem,\nTým OnlineSprava' },
+  { id: '4', key: 'plny_nazev', description: 'Plný název SVJ/BD', type: 'building' },
+  { id: '5', key: 'zkraceny_nazev', description: 'Zkrácený název pro předměty', type: 'building' },
+  { id: '6', key: 'osloveni', description: 'Způsob oslovení členů', type: 'building' },
+  { id: '7', key: 'adresa', description: 'Adresa budovy', type: 'building' },
+  { id: '8', key: 'ico', description: 'IČO', type: 'building' },
+  { id: '9', key: 'kontaktni_osoba', description: 'Kontaktní osoba pro dům', type: 'building' },
+  { id: '10', key: 'jmeno_zastupce', description: 'Jméno zákonného zástupce člena', type: 'building'},
+  { id: '11', key: 'hlasovaci_odkaz', description: 'Unikátní odkaz na hlasování pro člena', type: 'building'},
 ];
 
 export const MOCK_BUILDINGS: Building[] = [
@@ -111,6 +111,9 @@ export const MOCK_VOTES: Vote[] = [
         startDate: new Date().toISOString(),
         endDate: nextWeek.toISOString(),
         daysDuration: 7,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         attachments: [{ name: 'Rozpočet_střechy.pdf', url: '#' }],
         questions: [
             { id: 'q1', title: 'Schválení rekonstrukce střechy', description: 'Souhlasíte s provedením rekonstrukce dle předloženého rozpočtu?', voteType: 'qualified' },
@@ -130,6 +133,9 @@ export const MOCK_VOTES: Vote[] = [
         startDate: lastWeek.toISOString(),
         endDate: yesterday.toISOString(),
         daysDuration: 6,
+        isActive: false,
+        createdAt: lastWeek.toISOString(),
+        updatedAt: yesterday.toISOString(),
         attachments: [],
         questions: [
             { id: 'q2', title: 'Zvolení pana Svobody', description: 'Souhlasíte se zvolením pana Petra Svobody, bytem 103, za nového člena výboru?', voteType: 'simple' },
@@ -149,6 +155,9 @@ export const MOCK_VOTES: Vote[] = [
         startDate: tomorrow.toISOString(),
         endDate: new Date(nextWeek.getTime() + (1000 * 60 * 60 * 24 * 7)).toISOString(),
         daysDuration: 14,
+        isActive: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         attachments: [{ name: 'Nabídka_stanice.pdf', url: '#' }, { name: 'Technická_specifikace.pdf', url: '#' }],
         questions: [
             { id: 'q3a', title: 'Schválení instalace', description: 'Souhlasíte s instalací nabíjecích stanic v garážích?', voteType: 'simple' },
@@ -169,6 +178,9 @@ export const MOCK_VOTES: Vote[] = [
         startDate: new Date().toISOString(),
         endDate: nextWeek.toISOString(),
         daysDuration: 7,
+        isActive: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         attachments: [{ name: 'Navrh_zmeny_stanov.pdf', url: '#' }],
         questions: [
             { id: 'q4', title: 'Schválení nových stanov', description: 'Souhlasíte s navrhovanou úpravou stanov?', voteType: 'unanimous' },
@@ -187,8 +199,12 @@ export const MOCK_USER_VOTES: UserVoteSubmission[] = [
         voteId: 'v2', 
         memberId: 'm1',
         userId: 'user2',
-        choices: [{ questionId: 'q2', choice: 'PRO' }],
-        submissionType: 'online',
-        submittedAt: new Date().toISOString(),
+        choices: [{ questionId: 'q2', choice: 'PRO' }]
     }
+];
+
+export const MOCK_USERS: User[] = [
+    { id: 'user1', name: 'Admin User', email: 'admin@example.com', role: 'admin' },
+    { id: 'user2', name: 'Jan Novák', email: 'jan@novak.com', role: 'member', memberId: 'm1' },
+    { id: 'user3', name: 'Eva Svobodová', email: 'eva@svoboda.com', role: 'member', memberId: 'm2' }
 ];

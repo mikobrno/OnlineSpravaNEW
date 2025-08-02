@@ -1,5 +1,3 @@
-import { ReactNode } from 'react';
-
 // --- THEME TYPES ---
 export type Theme = 'light' | 'dark';
 
@@ -15,12 +13,14 @@ export interface Variable {
     description: string;
     type: 'global' | 'building';
     value?: string; // Only for global type
+    name?: string; // Add name property for compatibility
 }
 
 export interface Building {
   id: string;
   name: string;
   data: Record<string, string>; // Keys correspond to Variable keys of type 'building'
+  owner_id?: string; // Add for compatibility with mockData
 }
 
 export interface EmailTemplate {
@@ -74,6 +74,15 @@ export interface Vote {
     emailTemplate?: string;
     customEmailSubject?: string;
     customEmailBody?: string;
+    // Legacy properties for backward compatibility
+    status?: VoteStatus;
+    questions?: Question[];
+    attachments?: { name: string; url: string }[];
+    observerEmails?: string[];
+    emailLog?: { memberId: string; timestamp: string; }[];
+    memberTokens?: Record<string, string>; // { [memberId]: "unique_token" }
+    representativeOverrides?: Record<string, string>; // { [representedMemberId]: "representativeMemberId" }
+    created_by?: string; // Alternative field name
 }
 
 export interface VoteOption {
@@ -164,6 +173,7 @@ export interface UserVoteSubmission {
     id?: number;
     voteId: string;
     userId: string;
+    memberId?: string; // Add for compatibility
     choices: {
         questionId: string;
         choice: VoteChoice;
@@ -178,6 +188,8 @@ export interface AppContextType {
   // Building selection state
   selectedBuildingId: string | null;
   setSelectedBuildingId: (buildingId: string | null) => void;
+  selectedBuilding?: Building | null; // Add for compatibility
+  profile?: any; // Add for compatibility
   
   // Data Management (Supabase async)
   buildings: Building[];
@@ -222,6 +234,10 @@ export interface AppContextType {
   setCurrentUserById: (id: string) => void;
   userVotes: UserVoteSubmission[];
   submitUserVote: (vote: UserVoteSubmission) => void;
+  submitManualVote?: (vote: any) => Promise<void>; // Add for compatibility
+  startVote?: (voteId: string) => Promise<void>; // Add for compatibility
+  cancelVote?: (voteId: string) => Promise<void>; // Add for compatibility
+  updateVoteRepresentative?: (voteId: string, memberId: string, representativeId: string) => Promise<void>; // Add for compatibility
 }
 
 export type ToastMessage = {

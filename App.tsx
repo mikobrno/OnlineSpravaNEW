@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAppContext } from './contexts/AppContext';
 import { useTheme } from './contexts/ThemeContext';
 import { SimpleGeneratorView } from './components/EmailGenerator';
-import { AdvancedAdminView } from './components/Admin';
+import { AdvancedAdminView } from './components/admin/AdvancedAdminView';
 import VotingDashboard from './components/VotingDashboard';
-import { MemberManagement } from './components/MemberManagement';
+import { MembersView } from './components/members/MembersView';
 import { Mail, Vote as VoteIcon, SlidersHorizontal, Building, ChevronsUpDown, Check, UserPlus, Sun, Moon } from 'lucide-react';
 
 const ThemeSwitcher = () => {
@@ -184,7 +184,7 @@ function App() {
         }
         
         if (appView === 'sprava-clenu') {
-            return <MemberManagement onBack={() => setAppView('hlasovani')} />;
+            return <MembersView />;
         }
         
         return <div className="p-8 text-center"><h2 className="text-2xl font-bold text-gray-900 dark:text-white">Funkce se připravuje</h2><p className="text-gray-500 dark:text-gray-400 mt-2">Obsah pro '{appView}' bude brzy dostupný.</p></div>;
