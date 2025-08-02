@@ -25,6 +25,7 @@ import {
   castVoteService,
   emailRecordService
 } from '../lib/supabaseService';
+import { supabaseManager } from '../lib/supabaseManager';
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -56,6 +57,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const loadData = async () => {
       setIsLoading(true);
       try {
+        console.log('🔄 Kontroluji Supabase připojení...');
+        
+        // Kontrola a inicializace Supabase připojení
+        const healthCheck = await supabaseManager.checkHealth();
+        console.log('🔍 Supabase stav:', supabaseManager.getConnectionInfo());
+        
+        if (!healthCheck.isConnected) {
+          console.warn('⚠️ Supabase není připojena, používám mock data');
+          setUsers(MOCK_USERS);
+          setUserVotes(MOCK_USER_VOTES);
+          if (!currentUser || !MOCK_USERS.find(u => u.id === currentUser.id)) {
+            setCurrentUser(MOCK_USERS.find(u => u.role === 'admin') || MOCK_USERS[0]);
+          }
+          return;
+        }
+
+        // Inicializace základních dat
+        await supabaseManager.initializeBasicData();
+        
         console.log('🔄 Načítám data z Supabase...');
         
         // Načtení základních dat z databáze

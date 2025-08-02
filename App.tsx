@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppContext } from './contexts/AppContext';
 import { useTheme } from './contexts/ThemeContext';
 import { SimpleGeneratorView } from './components/EmailGenerator';
 import { AdvancedAdminView } from './components/admin/AdvancedAdminView';
 import VotingDashboard from './components/VotingDashboard';
 import { MembersView } from './components/members/MembersView';
+import { SupabaseStatus, SupabaseSetupBanner } from './components/common/SupabaseStatus';
+import { supabaseManager } from './lib/supabaseManager';
 import { Mail, Vote as VoteIcon, SlidersHorizontal, Building, ChevronsUpDown, Check, UserPlus, Sun, Moon } from 'lucide-react';
 
 const ThemeSwitcher = () => {
@@ -169,6 +171,19 @@ const AppNavigation = ({ appView, setAppView }: {
 function App() {
     const { currentUser, isLoading } = useAppContext();
     const [appView, setAppView] = useState<'hlasovani' | 'emailGenerator' | 'administrace' | 'sprava-clenu'>('hlasovani');
+    const [supabaseConnected, setSupabaseConnected] = useState<boolean | null>(null);
+    const [supabaseErrors, setSupabaseErrors] = useState<string[]>([]);
+    const [showSupabaseBanner, setShowSupabaseBanner] = useState(true);
+
+    // Kontrola Supabase připojení při načtení
+    useEffect(() => {
+        const checkSupabase = async () => {
+            const health = await supabaseManager.checkHealth();
+            setSupabaseConnected(health.isConnected);
+            setSupabaseErrors(health.errors);
+        };
+        checkSupabase();
+    }, []);
 
     const renderContent = () => {
         if (appView === 'hlasovani') {
@@ -221,6 +236,11 @@ function App() {
                         </div>
                         
                         <div className="flex items-center gap-4">
+                            <SupabaseStatus 
+                                isConnected={supabaseConnected === true} 
+                                errors={supabaseErrors}
+                                className="mr-2"
+                            />
                             <ThemeSwitcher />
                             <UserSelector />
                         </div>
@@ -229,10 +249,18 @@ function App() {
             </header>
 
             {/* Navigation */}
-            <AppNavigation appView={appView} setAppView={setAppView} />
+            <AppNavigation appView={appView} setAppView={(view) => setAppView(view as typeof appView)} />
 
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Supabase Setup Banner */}
+                {supabaseConnected === false && showSupabaseBanner && supabaseErrors.length > 0 && (
+                    <SupabaseSetupBanner 
+                        errors={supabaseErrors}
+                        onDismiss={() => setShowSupabaseBanner(false)}
+                    />
+                )}
+                
                 {renderContent()}
             </main>
         </div>
