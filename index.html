@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="cs" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OnlineSprava | Hlasování & Email</title>
+    <style>
+      /* This is a simple loader styles. You can enhance it. */
+      #root .loading-screen {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #111827; /* dark:bg-gray-900 */
+      }
+      #root .loading-screen p {
+        color: #d1d5db; /* dark:text-gray-300 */
+        margin-top: 1rem;
+        font-size: 1.125rem;
+      }
+      @keyframes pulse {
+        50% {
+          opacity: .5;
+        }
+      }
+      #root .loading-screen .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.12.0",
+    "react/": "https://esm.sh/react@^19.1.1/",
+    "react": "https://esm.sh/react@^19.1.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.536.0",
+    "vite": "https://esm.sh/vite@^7.0.6",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^4.7.0",
+    "jspdf-autotable": "https://esm.sh/jspdf-autotable@^5.0.2",
+    "jspdf": "https://esm.sh/jspdf@^3.0.1",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.53.0",
+    "@supabase/auth-ui-react": "https://esm.sh/@supabase/auth-ui-react@^0.4.7",
+    "@supabase/auth-ui-shared": "https://esm.sh/@supabase/auth-ui-shared@^0.1.8"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-200 font-sans antialiased">
+    <div id="root">
+        <div class="loading-screen">
+          <svg class="h-16 w-16 text-blue-500 animate-pulse" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9/2.3_2.3_0_0_1_2.3_2.3V19a2_2_0_0_1-2_2H4a2_2_0_0_1-2-2V5a2_2_0_0_1_2-2h3.2a2_2_0_0_1_1.6.8L13_9h5.1a2_2_0_0_1_1.9_2.2l-1.4_6.8A2_2_0_0_1_16.8_20H14"/><path d="m22 9-4.24-3.53a2_2_0_0_0-2.52.14L13_9"/></svg>
+          <p>Načítání aplikace...</p>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

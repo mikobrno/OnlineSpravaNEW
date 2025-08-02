@@ -1,0 +1,6 @@
+{
+  "name": "OnlineSprava | Hlasování & Email",
+  "description": "Komplexní aplikace pro společenství vlastníků (SVJ) pro správu online hlasování a generování přizpůsobených e-mailů. Zahrnuje funkce jako vytváření hlasování, sledování průběhu, správa členů a pokročilý generátor e-mailových šablon.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
